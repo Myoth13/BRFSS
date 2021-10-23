@@ -73,10 +73,11 @@ infectious diseases that affect the adult population.
     the population.
 
 3)  Data was collected through a telephone-based survey, so it is
-    non-response biased. [@schneider2010]
+    non-response biased. [@schneider2010] Needs weighting (coming soon).
 
-Distribution of the sample by the calculated age groups (**X_age_g**)
-and sex (**sex**) filled by employment status (**employ1**):
+Age misrepresentation. Distribution of the sample by the calculated age
+groups (**X_age_g**) and sex (**sex**) filled by employment status
+(**employ1**):
 
 ```{r data_distrib}
 
@@ -91,15 +92,16 @@ brfss2013 %>%
       facet_wrap(~sex)
 ```
 
-Indeed, demographics is skewed to the older age, especially in the
-female group. Analysis will be made separately by age groups to mitigate
-this skewness.
+Indeed, demographics is heavily skewed to the older age, especially in
+the female group.
 
 ```{r data_clean}
 
 #cleaning data without age and sex
 brfss2013 <- brfss2013 %>% 
   filter(!is.na(X_age_g), !is.na(sex) )
+
+#needs weights!!!! googling in the process... 
 
 #creating separate dataset for each research question
 dat_q1<-brfss2013 
@@ -141,9 +143,9 @@ From CDC
     people with healthy weight.
 
 This is a very personal problem for me as despite having normal weight
-and maintaining a relatively healthy lifestyle I still have metabolic
-syndrome. Low carb diet and regular physical exercises helped me
-drastically increase my quality of life.
+and maintaining a relatively healthy lifestyle I have got metabolic
+syndrome. Keeping a diet low in refined carbs and sugars and regular
+physical exercises helped me drastically increase my quality of life.
 
 ### 2.1 Diabetes mellitus
 
