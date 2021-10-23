@@ -1,6 +1,6 @@
 ---
-title: "Exploring the BRFSS data"
-subtitle: "Part 1 - Exploratory Data Analysis"
+title: "Exploring the BRFSS 2013 data"
+subtitle: "Exploratory Data Analysis - Introduction to Probability and Data with R"
 author: "Anna Loznevaia"
 date: "`r Sys.Date()`"
 output: 
@@ -56,24 +56,22 @@ infectious diseases that affect the adult population.
 
 1)  BRFSS conducts both landline telephone- and cellular telephone-based
     surveys. In conducting the BRFSS landline telephone survey,
-    interviewers collect data from a randomly dplyr::selected adult in a
+    interviewers collect data from a randomly selected adult in a
     household. In conducting the cellular telephone version of the BRFSS
     questionnaire, interviewers collect data from an adult who
     participates by using a cellular telephone and resides in a private
     residence or college housing.
 
-    **Conclusion about inference** - this is observational study - only
-    **correlation** can be evaluated.
+    Observational study - only **correlation** can be evaluated.
 
-2)  Data was collected through **random sampling**. BRFSS is an ongoing
-    surveillance system designed to measure behavioral risk factors for
-    the **non-institutionalized adult population (18 years of age and
-    older) residing in the US**. Use of the final weight in analysis is
-    necessary if users are to make generalizations from the sample to
-    the population.
+2)  Survey design includes stratification alongside with random
+    sampling. Use of the **final weight** in analysis is necessary if
+    users are to make generalizations from the sample to the population.
+    I will skip it for now, so **my results cannot be generalized to the
+    population**.
 
 3)  Data was collected through a telephone-based survey, so it is
-    non-response biased. [@schneider2010] Needs weighting (coming soon).
+    **non-response biased**. [@schneider2010]
 
 Age misrepresentation. Distribution of the sample by the calculated age
 groups (**X_age_g**) and sex (**sex**) filled by employment status
@@ -101,7 +99,7 @@ the female group.
 brfss2013 <- brfss2013 %>% 
   filter(!is.na(X_age_g), !is.na(sex) )
 
-#needs weights!!!! googling in the process... 
+#weights here
 
 #creating separate dataset for each research question
 dat_q1<-brfss2013 
@@ -111,8 +109,8 @@ dat_q3<-brfss2013
 ## Part 2: Research questions
 
 In the last centuries humanity eliminated numerous maladies and invented
-many new ones as well. One of them is obesity and diseases associated
-with it - diabetes type 2, cardiovascular diseases, cancer,
+many new ones as well. One of them is obesity pandemic and diseases
+associated with it - diabetes type 2, cardiovascular diseases, cancer,
 non-alcoholic fatty liver disease and many other disorders [@grundy2004;
 @haslam2005; @bray2004]
 
@@ -141,11 +139,6 @@ From CDC
     the United States was \$147 billion in 2008. Medical costs for
     people who had obesity was \$1,429 higher than medical costs for
     people with healthy weight.
-
-This is a very personal problem for me as despite having normal weight
-and maintaining a relatively healthy lifestyle I have got metabolic
-syndrome. Keeping a diet low in refined carbs and sugars and regular
-physical exercises helped me drastically increase my quality of life.
 
 ### 2.1 Diabetes mellitus
 
@@ -194,6 +187,11 @@ subject is considered insulin resistant. There are many causes of
 insulin resistance. [@petersen2018] Insulin resistance is considered a
 component of the metabolic syndrome.
 
+This is a very personal problem for me as despite having normal weight
+and maintaining a relatively healthy lifestyle I have got metabolic
+syndrome. Keeping a diet low in refined sugars and regular physical
+exercises helped me drastically increase my quality of life.
+
 **Risk factors**
 
 There are a number of risk factors for insulin resistance, including
@@ -226,6 +224,8 @@ resistance also include:
 
 In addition some medications and other health conditions can raise the
 risk.
+
+I would like to explore income level as a risk factor as well.
 
 #### 2.3.2 BMI as evaluation of obesity
 
@@ -272,8 +272,9 @@ Variables used:
 
 -   **X_rfbmi5**: Overweight Or Obese Calculated Variable
 
+```{=html}
 <!-- -->
-
+```
 -   ***X_age_g***: Imputed Age In Six Groups
 
 -   **sex**: Respondents Sex
@@ -286,8 +287,9 @@ Variables used:
 
 -   **X_rfbmi5**: Overweight Or Obese Calculated Variable
 
+```{=html}
 <!-- -->
-
+```
 -   ***X_age_g***: Imputed Age In Six Groups
 
 -   **sex**: Respondents Sex
