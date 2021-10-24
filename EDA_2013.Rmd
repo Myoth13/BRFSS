@@ -63,34 +63,36 @@ infectious diseases that affect the adult population.
     This is an observational study - only **correlation** can be
     evaluated.
 
-2)  Survey design includes stratification alongside with random
-    sampling. Use of the **final weight** in analysis is necessary if
-    users are to make generalizations from the sample to the population.
-    I will skip it for now, so **my results cannot be generalized to the
+2)  Survey design includes stratification alongside random sampling. Use
+    of the **final weight** in analysis is necessary if users are to
+    make generalizations from the sample to the population. I will skip
+    it for now, so **my results cannot be generalized to the
     population**.
 
 3)  Data was collected through a telephone-based survey, so it is
     **non-response biased**. [@schneider2010]
 
-Age misrepresentation. Distribution of the sample by the calculated age
-groups (**X_age_g**) and sex (**sex**) filled by employment status
-(**employ1**):
+Age and ethnicity misrepresentation. Distribution of the sample by the
+calculated age groups (**X_age_g**) and sex (**sex**) filled by race
+(**X_mrace1:** Calculated Non-Hispanic Race Including Multiracial):
 
 ```{r data_distrib}
 
 brfss2013 %>%
   filter(!is.na(sex)) %>% 
-    ggplot(aes(x = X_age_g, fill = X_incomg )) +
+    ggplot(aes(x = X_age_g, fill = X_mrace1 )) +
       labs( x="age group", title = "Distribution by sex and age groups", 
-            fill="Income level" ) +
+            fill="Race" ) +
       theme_light() +
       theme(axis.text.x = element_text(size=11, angle = 90, vjust = 0.5, hjust=1)) +
       geom_bar() +
       facet_wrap(~sex)
 ```
 
-Indeed, demographics is heavily skewed to the older age, especially in
-the female group.
+Indeed, age demographics is heavily skewed to the older age, especially
+in the female group. Race demographics skewed as well. As this is
+crucial for calculating this skewness should be addressed in detailed
+analysis later.
 
 ```{r data_clean}
 
@@ -151,7 +153,7 @@ cognitive impairment and others. [@harding2018a]
 
 -   Type 1 diabetes is an idiopathic (fancy word for "we don't know the
     reason") auto-immune disorder with usually an early life onset
-    results from failure of the pancreas to produce enough insulin due
+    resulting from failure of the pancreas to produce enough insulin due
     to loss of beta cells. This form was previously referred to as
     "insulin-dependent diabetes mellitus" (IDDM) or "juvenile
     diabetes".[@dimeglio2018]
@@ -184,12 +186,12 @@ response to carbohydrates consumed in the diet. When higher circulating
 insulin levels are necessary to achieve the glucose-lowering response, a
 subject is considered insulin resistant. There are many causes of
 insulin resistance. [@petersen2018] Insulin resistance is considered a
-component of the metabolic syndrome.
+component of metabolic syndrome.
 
-This is a very personal problem for me as despite having normal weight
-and maintaining a relatively healthy lifestyle I have got metabolic
+This is a very personal problem for me as despite maintaining normal
+weight and a relatively healthy lifestyle I have to deal with metabolic
 syndrome. Keeping a diet low in refined sugars and regular physical
-exercises helped me drastically increase my quality of life.
+exercises helped me drastically increase life quality.
 
 **Risk factors**
 
@@ -265,13 +267,13 @@ than Caucasians, some nations have redefined obesity; Japan has defined
 obesity as any BMI greater than 25 kg/m^2^[@kanazawa2005]while China
 uses a BMI of greater than 28 kg/m^2^.[@bei-fan2002]
 
-There is a more precise metric - hip to waste ratio, which takes into
+There is a more precise metric - hip to waist ratio, which takes into
 consideration fat distribution in the body, [@sweeting2007] but it is
 impossible to derive from this dataset.
 
 #### 2.3.3 Distribution of obesity by age groups
 
-Explore how overweight and obesity rate differ among age groups.
+Explore how overweight and obesity rates differ among age groups.
 
 Variables used:
 
@@ -285,7 +287,7 @@ Variables used:
 
 #### 2.3.4 Distribution of obesity by income groups
 
-Explore how overweight and obesity rate differ among income groups.
+Explore how overweight and obesity rates differ among income groups.
 
 Variables used:
 
@@ -297,7 +299,7 @@ Variables used:
 
 -   **sex**: Respondents Sex
 
-#### 2.3.5 Distribution of diabetes by ethnic and age groups
+#### 2.3.5 Distribution of diabetes by race and age
 
 In this part I will explore age and ethnicity as a risk factor
 
@@ -319,10 +321,10 @@ Variables used:
 As total diabetes score I'm going to use diabetes, pre-diabetes and
 gestational diabetes combined because of the similar initial mechanism
 and moreover it is not possible to separate type 1 from type 2 from this
-dataset. Type 1 diabetes is relatively rear compare to type 2 - around
+dataset. Type 1 diabetes is relatively rare compared to type 2 - around
 10-15%, but its incidence is also increasing. [@katsarou2017]
 
-#### 2.3.6 Distribution of diabetes by ethnic groups and income levels
+#### 2.3.6 Distribution of diabetes by race and income levels
 
 In this part I will explore income and ethnicity as a risk factor
 
@@ -332,7 +334,7 @@ Variables used:
 -   **X_incomg**: Computed Income Categories
 -   **diabete3: (**Ever Told) You Have Diabetes
 
-As total diabetes score I'm going to use diabetes, pre-diabetes and
+As a total diabetes score I'm going to use diabetes, pre-diabetes and
 gestational diabetes combined.
 
 #### 2.3.7 Obesity correlation with diabetes by income levels
@@ -359,7 +361,7 @@ Variables used:
 
 -   **bphigh4**: Ever Told Blood Pressure High
 
-As total CV disease score I'm going to use combination of this 4
+As a total CV disease score I'm going to use a combination of these 4
 variables.
 
 -   **X_rfbmi5**: Overweight Or Obese Calculated Variable
@@ -386,11 +388,10 @@ health evaluation. I'm going to include following parameters:
 #### 2.4.2 Food habits
 
 I want to calculate daily fruits and vegetable consumption. I will
-roughly estimate healthy food habits from consumption fruit portions per
-day (only *whole fruits*, as I do not include fresh juice here because
-if its high sugar low fiber content), green and orange vegetable
-portions per day (as others can be too starchy) and legumes portion per
-week.
+roughly estimate healthy food habits from the amount of fruit portions
+per day (only whole fruits, as I do not include fresh juice here because
+of its high sugar low fiber content), green and orange vegetable
+portions per day (as others can be too starchy) and legumes per week.
 
 -   ***fruit1***: How Many Times Did You Eat Fruit?
 
@@ -415,12 +416,13 @@ taken from
 
 #### 2.4.3 Sugar consumption
 
-Excessive caloric intake in form of a diet high in fast carbs was stated
-as one of the major risk factors for developing insulin resistance. I'm
-interested in evaluation of correlation between sugar consumption and
-health based on accessible parameters. There isn't much data available
-here, as there are just two sugar consumption questions and they are
-located in the optional part of the questionnaire.
+Excessive caloric intake in the form of a diet high in fast carbs was
+stated as one of the major risk factors for developing insulin
+resistance. I'm interested in the evaluation of correlation between
+sugar consumption and health based on accessible parameters. There isn't
+much data available here, as there are just two sugar consumption
+questions and they are located in the optional part of the
+questionnaire.
 
 Optional Module 5 - Sugar Drinks
 
@@ -448,8 +450,8 @@ be harmful for health) don't do extra exercises.
 
 -   ***X_rfsmok3***: Current Smoking Calculated Variable
 
-I would love to use numerical variable reflecting amount of cigarettes
-smoked a day, but this data isn't available in here.
+I would love to use a numerical variable reflecting the amount of
+cigarettes smoked a day, but this data isn't available here.
 
 -   ***X_drnkmo4***: Computed Total Number Drinks A Month
 
@@ -469,8 +471,9 @@ CDC evaluation of heavy drinking:
 #### 2.4.6 Sleep pattern
 
 Disruption in the sleep pattern is one of major risk factors for
-development of insulin resistance and diabetes. I will include amount of
-sleep hours as my metric, as there is no other data available here.
+development of insulin resistance and diabetes. I will include the
+amount of sleep hours as my metric, as there is no other data available
+here.
 
 -   ***sleptim1***: How Much Time Do You Sleep
 
@@ -501,11 +504,11 @@ for_graph_obese_age <- dat_q1 %>%
   group_by(X_age_g,sex,X_obese) %>% 
   summarise(n=n()) %>% 
   group_by(X_age_g,sex) %>% 
-  mutate(proc=n/sum(n)) 
+  mutate(perc=n/sum(n)) 
 
 #distribution of obesity by age groups and sex
 for_graph_obese_age %>%
-  ggplot(aes(x = sex, y=proc,  fill = X_obese )) +
+  ggplot(aes(x = sex, y=perc,  fill = X_obese )) +
   labs( 
        x="", 
        y="percentage",
@@ -517,7 +520,7 @@ for_graph_obese_age %>%
   geom_bar(alpha=1,stat="identity")+
   scale_fill_manual(values=c("#999999", "magenta", "#56B4E9")) +
   geom_text(
-      aes(x=sex, y=proc, label = percent(proc,2), vjust=1.5), 
+      aes(x=sex, y=perc, label = percent(perc,2), vjust=1.5), 
       position = position_fill()
       ) 
   
@@ -525,7 +528,7 @@ for_graph_obese_age %>%
 
 There is a noticeable difference between sexes. We can see maximum
 amount of overweight and obese people in middle age groups. Extensive
-analyse which will account for skewness and ethnic differences
+analysis which will account for skewness and ethnic differences
 (different BMI evaluation for Asian) is needed.
 
 #### 3.1.2 Distribution of obesity by income groups
@@ -546,11 +549,11 @@ for_graph_obese_inc <- dat_q1 %>%
   group_by(X_incomg,sex,X_obese) %>% 
   summarise(n=n()) %>% 
   group_by(X_incomg,sex) %>% 
-  mutate(proc=n/sum(n)) 
+  mutate(perc=n/sum(n)) 
 
 #distribution of obesity by income groups and sex
 for_graph_obese_inc %>%
-  ggplot(aes(x = sex, y=proc,  fill = X_obese )) +
+  ggplot(aes(x = sex, y=perc,  fill = X_obese )) +
   labs( 
        x="", 
        y="percentage",
@@ -562,18 +565,18 @@ for_graph_obese_inc %>%
   geom_bar(alpha=1,stat="identity")+
   scale_fill_manual(values=c("#999999", "magenta", "#56B4E9")) +
   geom_text(
-      aes(x=sex, y=proc, label = percent(proc,2), vjust=1.5), 
+      aes(x=sex, y=perc, label = percent(perc,2), vjust=1.5), 
       position = position_fill()
       ) 
 ```
 
-If overall difference is not big, there is an increasing gap between men
-and women as income level increasing. It would be interesting to look at
-fresh data, as there has been a new trend in healthy lifestyle recently.
-Extensive analyse which will account for skewness and ethnic differences
-(different BMI evaluation for Asian) is needed.
+If the overall difference is not big, there is an increasing gap between
+men and women as income level increases. It would be interesting to look
+at fresh data, as there has been a new trend in healthy lifestyle
+recently. Extensive analysis which will account for skewness and ethnic
+differences (different BMI evaluation for Asian) is needed.
 
-#### 3.1.3 Distribution of diabetes by ethnic and age groups
+#### 3.1.3 Distribution of diabetes by race and age
 
 -   **X_mrace1**: Calculated Non-Hispanic Race Including Multiracial
 
@@ -597,15 +600,15 @@ for_graph_ethno <- dat_q1 %>%
   group_by(X_age_g,X_mrace1,diabetes_char) %>% 
   summarise(n=n()) %>% 
   group_by(X_age_g,X_mrace1) %>% 
-  mutate(proc=n/sum(n)) 
+  mutate(perc=n/sum(n)) 
 
-#distribution of the diabetes by ethnical groups and age
+#distribution of the diabetes by race and age
 for_graph_ethno %>%
-  ggplot(aes(x = X_mrace1, y=proc,  fill = diabetes_char )) +
+  ggplot(aes(x = X_mrace1, y=perc,  fill = diabetes_char )) +
   labs( 
        x="", 
        y="percentage",
-       title = "Distribution of diabetes by ethnicity", 
+       title = "Distribution of diabetes by race and age", 
        fill="diabetis" 
       ) +
   theme_light() +
@@ -619,14 +622,14 @@ for_graph_ethno %>%
   geom_bar(alpha=1,stat="identity") +
   scale_fill_manual(values=c("#999999", "magenta")) +
   geom_text(
-      aes(x=X_mrace1, y=proc, label = percent(proc,2), vjust=0, color = diabetes_char), 
+      aes(x=X_mrace1, y=perc, label = percent(perc,2), vjust=0, color = diabetes_char), 
       position = position_fill(),
       show.legend = FALSE
       ) +
   scale_colour_manual(values=c("white", "black"))
 ```
 
-#### 3.1.4 Distribution of diabetes by ethnic groups and income levels
+#### 3.1.4 Distribution of diabetes by race and income levels
 
 -   **X_mrace1**: Calculated Non-Hispanic Race Including Multiracial
 -   **X_incomg**: Computed Income Categories
@@ -640,16 +643,16 @@ for_graph_income <- dat_q1 %>%
   group_by(X_incomg,X_mrace1,diabetes_char) %>% 
   summarise(n=n()) %>% 
   group_by(X_incomg,X_mrace1) %>% 
-  mutate(proc=n/sum(n)) 
+  mutate(perc=n/sum(n)) 
 
 
-#Distribution of diabetes by ethnical groups and income
+#Distribution of diabetes by race and income
 for_graph_income %>%
-  ggplot(aes(x = X_mrace1, y=proc,  fill = diabetes_char )) +
+  ggplot(aes(x = X_mrace1, y=perc,  fill = diabetes_char )) +
   labs( 
     x="", 
     y="percentage",
-    title = "Distribution of diabetes by income", 
+    title = "Distribution of diabetes by race and income", 
     fill="diabetis" 
   ) +
   theme_light() +
@@ -663,7 +666,7 @@ for_graph_income %>%
   geom_bar(alpha=1,stat="identity")+
   scale_fill_manual(values=c("#999999", "magenta")) +
   geom_text(
-      aes(x=X_mrace1, y=proc, label = percent(proc,2), vjust=0, color = diabetes_char), 
+      aes(x=X_mrace1, y=perc, label = percent(perc,2), vjust=0, color = diabetes_char), 
       position = position_fill(),
       show.legend = FALSE
       ) +
@@ -671,10 +674,12 @@ for_graph_income %>%
 
 ```
 
-In the both diagrams same pattern can be noticed, especially it is
-prominent in the middle-old age groups and low income groups.
+In the both diagrams similar patterns can be noticed with increased
+levels for some groups (Native Hawaiian or other Pacific Islander, Black
+or African American and American Indian or Alaskan Native). But due to
+serious misrepresentation of these groups it requires adjustments.
 
-Extensive analyse which will account for skewness and weights (account
+Extensive analysis which will account for skewness and weights (account
 for design of the study) is needed.
 
 #### 3.1.5 Obesity correlation with diabetes
@@ -722,13 +727,11 @@ for_graph %>%
 ```
 
 Despite almost the same obesity rate among income groups (see part
-3.1.2), levels of diabetes differ significantly. Also proportion of
-normal weight diabetics to overweight diabetics drops from 0,4 (12/30,
-10/24, 8/22) in groups with income level below 35,000 to 0,3 (6/18,
-4/12) in higher income groups. From which I can make a conjecture that
-income level alone could be significant risk factor for diabetes.
+3.1.2), levels of diabetes differ significantly. From which I can make a
+conjecture that income level alone could be a significant risk factor
+for diabetes.
 
-Extensive analyse which will account for skewness and weights (account
+Extensive analysis which will account for skewness and weights (account
 for design of the study) is needed.
 
 #### 3.1.6 Obesity correlation with CV diseases
@@ -788,11 +791,10 @@ for_graph %>%
 
 ```
 
-We can see here slightly different pattern. Income has a less weight in
-the obese (increased in 1,5 times between marginal income levels) than
-normal group (percent of CV doubled). But overall dynamics is the same.
+Overall dynamics is the same with diabetes - income level alone could be
+a significant risk factor for CV diseases.
 
-Extensive analyse which will account for skewness and weights (account
+Extensive analysis which will account for skewness and weights (account
 for design of the study) is needed.
 
 #### 3.1.7 Conclusion
@@ -852,9 +854,8 @@ corrplot(matrix.cor, method="color",
 ```
 
 Here we can see that correlation between age, income level and BMI is
-very weak. I expected it to be higher actually. CV diseases correlate
-most heavily with age as expected, then comes diabetes, BMI and income
-level.
+very weak. CV diseases correlate most heavily with age as expected, then
+comes diabetes, BMI and income level.
 
 ### Part 3.2 Lifestyle risk-factors (Research question 3)
 
@@ -904,8 +905,8 @@ dat_q3 %>%
     )
 ```
 
-We can see that combined general health score distributed more
-continuous.
+We can see that the combined general health score is distributed more
+continuously.
 
 #### 3.2.2 Fruits
 
@@ -919,7 +920,7 @@ continuous.
 dat_q3 <- dat_q3 %>%
   filter(!is.na(fruit1))
 
-#daily fruits comsumption
+#daily fruits consumption
 dat_q3 <- dat_q3 %>% 
   mutate(X_fruit_daily = case_when(
                       fruit1 < 200 ~ fruit1 %% 100 ,
@@ -1014,7 +1015,7 @@ dat_q3 %>%
 dat_q3 %>%
   filter(!is.na(X_health_benchmark)) %>%
   ggplot(aes(x=X_fruit_daily, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="fruit daily intake", title = "healh score and fruit daily intake", color="age" ) +
+   labs( x="fruit daily intake", title = "health score and fruit daily intake", color="age" ) +
     theme_light() +
     geom_smooth() +
     facet_wrap( ~ sex)
@@ -1036,7 +1037,7 @@ will be needed.
 dat_q3 <- dat_q3 %>%
   filter(!is.na(fvgreen))
 
-#daily green vegetables comsumption
+#daily green vegetables consumption
 dat_q3 <- dat_q3 %>% 
   mutate(X_vege_green_daily = case_when(
                       fvgreen < 200 ~ fvgreen %% 100 ,
@@ -1127,7 +1128,7 @@ dat_q3 %>%
   ggplot(aes(x=X_vege_green_daily, y=X_health_benchmark, color=X_age_g )) +
    labs( 
      x="green vegetables intake", 
-     title = "healh score and green vegetables daily intake", 
+     title = "health score and green vegetables daily intake", 
      color="age" 
     ) +
     theme_light() +
@@ -1150,7 +1151,7 @@ will be needed.
 dat_q3 <- dat_q3 %>%
   filter(!is.na(fvorang))
 
-#daily orange vegetables comsumption
+#daily orange vegetables consumption
 dat_q3 <- dat_q3 %>% 
   mutate(X_vege_orange_daily = case_when(
                       fvorang < 200 ~ fvorang %% 100 ,
@@ -1217,7 +1218,7 @@ plot(fit_X_vege_orange.exp)
 Mix of continuous and discrete distribution. Extended analysis will be
 needed later.
 
-##### Final disrtibution
+##### Final distribution
 
 ```{r X_vege_orange_daily_final}
 
@@ -1241,7 +1242,7 @@ dat_q3 %>%
   ggplot(aes(x=X_vege_orange_daily, y=X_health_benchmark, color=X_age_g )) +
    labs( 
      x="orange vegetables intake", 
-     title = "healh score and orange vegetables daily intake", 
+     title = "health score and orange vegetables daily intake", 
      color="age" 
     ) +
     theme_light() +
@@ -1265,7 +1266,7 @@ needed.
 dat_q3 <- dat_q3 %>%
   filter(!is.na(fvbeans))
 
-#weekly beans comsumption
+#weekly beans consumption
 dat_q3 <- dat_q3 %>% 
   mutate(X_beans_weekly = case_when(
                       fvbeans < 200 ~ fvbeans %% 100 * 7,
@@ -1357,7 +1358,7 @@ dat_q3 %>%
 dat_q3 %>%
   filter(!is.na(X_health_benchmark)) %>%
   ggplot(aes(x=X_beans_weekly, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="beans weekly intake", title = "healh score and beans intake", color="age" ) +
+   labs( x="beans weekly intake", title = "health score and beans intake", color="age" ) +
     theme_light() +
     geom_smooth() +
     facet_wrap( ~ X_age_g)
@@ -1407,7 +1408,7 @@ for_graph %>%
 
 dat_q3 %>%
   ggplot(aes(x=exerany2, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="exercising", title = "healh score and exercising", color="age" ) +
+   labs( x="exercising", title = "health score and exercising", color="age" ) +
     theme_light() +
     geom_boxplot(alpha=0) +
     facet_wrap( ~ sex )
@@ -1529,7 +1530,7 @@ dat_q3 %>%
 dat_q3 %>%
   filter(!is.na(X_health_benchmark)) %>%
   ggplot(aes(x=X_alcohol_num, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="normalized alcohol consumption", title = "healh score and alcohol", color="age" ) +
+   labs( x="normalized alcohol consumption", title = "health score and alcohol", color="age" ) +
     theme_light() +
     geom_smooth() +
     facet_wrap( ~ X_age_g )
@@ -1576,16 +1577,6 @@ for_graph %>%
       geom_bar(stat="identity" ) 
 ```
 
-In order to use smoking in my model I need to create numerical variable.
-
-```{r X_smoking_num}
-dat_q3 <- dat_q3 %>%
-  mutate(X_smoking_num = case_when( 
-                        X_rfsmok3 == "Yes" ~ 1, 
-                        X_rfsmok3 == "No" ~ 0 
-  ))
-```
-
 ##### Health benchmark correlation
 
 ```{r X_smoking_num_health}
@@ -1593,14 +1584,14 @@ dat_q3 <- dat_q3 %>%
 dat_q3 %>%
   filter(X_health_benchmark>-2) %>%
   ggplot(aes(x=X_rfsmok3, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="smoking", title = "healh score and smoking", color="age" ) +
+   labs( x="smoking", title = "health score and smoking", color="age" ) +
     theme_light() +
     geom_boxplot(alpha=0) +
     facet_wrap( ~ sex )
 
 ```
 
-Noticable negative correlation, more prominent for females.
+Noticeable negative correlation, more prominent for females.
 
 #### 3.2.9 Sleep quality
 
@@ -1654,7 +1645,7 @@ dat_q3 %>%
 dat_q3 <- dat_q3 %>%
   filter(sleptim1 <= quantile(dat_q3$sleptim1,0.99))
 
-#normalizing to 6 hors a day 
+#normalizing to 6 hours a day 
 dat_q3 <- dat_q3 %>%
   mutate(X_sleptim_norm = sleptim1/6)
 
@@ -1672,14 +1663,14 @@ dat_q3 %>%
 dat_q3 %>%
   filter(!is.na(X_health_benchmark)) %>%
   ggplot(aes(x=X_sleptim_norm, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="sleeping time normalized", title = "healh score and sleep", color="age" ) +
+   labs( x="sleeping time normalized", title = "health score and sleep", color="age" ) +
    theme_light() +
    geom_smooth() +
    facet_wrap( ~ sex)
 
 ```
 
-Relationship is not linear with an optimal value between 1 and 1,5.
+The relationship is not linear with an optimal value between 1 and 1,5.
 
 #### 3.2.10 Sugars - fruit juice
 
@@ -1694,7 +1685,7 @@ Juices?
 dat_q3 <- dat_q3 %>%
   filter(!is.na(fruitju1)) 
 
-#daily juice comsumption
+#daily juice consumption
 dat_q3 <- dat_q3 %>% 
   mutate(X_sugars_juice = case_when(
                       fruitju1 < 200 ~ fruitju1 %% 100,
@@ -1763,7 +1754,7 @@ dat_q3 %>%
 dat_q3 %>%
   filter(!is.na(X_health_benchmark)) %>%
   ggplot(aes(x=X_sugars_juice, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="juice consumption", title = "healh score and fresh juice", color="age" ) +
+   labs( x="juice consumption", title = "health score and fresh juice", color="age" ) +
     theme_light() +
     geom_smooth() +
     facet_wrap( ~ X_age_g + sex )
@@ -1777,8 +1768,8 @@ sugars, but add as a separate unit in the model.
 
 ***ssbsugar***: How Often Do You Drink Regular Soda Or Pop?
 
-**ssbsugar** and **ssbsugar** are from Optional Module, thus there is
-not much data records available. So I have to create separate dataset.
+**ssbsugar** and **ssbsugar** are from Optional Module, thus there are
+not many data records available. So I have to create a separate dataset.
 
 ##### Data cleaning
 
@@ -1788,7 +1779,7 @@ not much data records available. So I have to create separate dataset.
 dat_q3_sugar <- dat_q3 %>%
   filter(!is.na(ssbsugar)) 
 
-#daily soda comsumption
+#daily soda consumption
 dat_q3_sugar <- dat_q3_sugar %>% 
   mutate(X_sugars_soda = case_when(
                       ssbsugar < 200 ~ ssbsugar %% 100,
@@ -1856,7 +1847,7 @@ Righ
 dat_q3_sugar %>%
   filter(!is.na(X_health_benchmark)) %>%
   ggplot(aes(x=X_sugars_soda, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="soda consumption", title = "healh score and soda", color="age" ) +
+   labs( x="soda consumption", title = "health score and soda", color="age" ) +
     theme_light() +
     geom_smooth(method = "lm") +
     facet_wrap( ~ X_age_g )
@@ -1877,7 +1868,7 @@ There is an observable negative correlation
 dat_q3_sugar <- dat_q3_sugar %>%
   filter(!is.na(ssbfrut2)) 
 
-#daily sweetened drinks comsumption
+#daily sweetened drinks consumption
 dat_q3_sugar <- dat_q3_sugar %>% 
   mutate(X_sugars_other = case_when(
                       ssbfrut2 < 200 ~ ssbfrut2 %% 100,
@@ -1951,7 +1942,7 @@ dat_q3_sugar %>%
   ggplot(aes(x=X_sugars_other, y=X_health_benchmark, color=X_age_g )) +
    labs( 
      x="sweetened drinks consumption", 
-     title = "healh score and sweetened drinks", 
+     title = "health score and sweetened drinks", 
      color="age" 
     ) +
     theme_light() +
@@ -2024,9 +2015,9 @@ corrplot(matrix.cor, method="color",
          )
 ```
 
-About negative correlation and diabetes: it is most likely due to
+About negative correlation and diabetes: it is most likely due to the
 observational nature of the study - it is expected behavior from
-diabetic to stop consume sugary drinks and other fast carbs. What is
+diabetic to stop consuming sugary drinks and other fast carbs. What is
 surprising for me - low correlation of BMI and sugar consumption.
 
 ##### Other parameters correlation
@@ -2050,6 +2041,13 @@ dat_q3 <- dat_q3 %>%
   mutate(X_exe_num = case_when( 
                         exerany2 == "Yes" ~ 1, 
                         exerany2 == "No" ~ 0 
+  ))
+
+#smoking numerical var
+dat_q3 <- dat_q3 %>%
+  mutate(X_smoking_num = case_when( 
+                        X_rfsmok3 == "Yes" ~ 1, 
+                        X_rfsmok3 == "No" ~ 0 
   ))
 
 #selecting data for the model
@@ -2085,13 +2083,14 @@ corrplot(matrix.cor, method="color",
 
 1.  On almost all parameters related to food habits correlation is
     pretty weak. I think one reason for this may be that data is taken
-    from an epidemiological observational study, thus it can be other
-    way around - people with health problems switching to a more healthy
-    lifestyle in order to mitigate their problem. Low correlation of BMI
-    with almost every lifestyle related variable was a surprise for me
-    though, it needs additional exploration in the future.
-
-    There are a lot of non-linear relationship which require extensive
+    from an epidemiological observational study, thus it can be the
+    other way around - people with health problems switching to a more
+    healthy lifestyle in order to mitigate their problem. Low
+    correlation of BMI with almost every lifestyle related variable was
+    a surprise for me though, it needs additional exploration in the
+    future.\
+    \
+    There are a lot of non-linear relationships which require extensive
     analysis, that is out of the scope of this study. The underlying
     reason may be non-linearity of response in biological systems
     (hormetic property) - too much of a good thing (physical activity
@@ -2099,5 +2098,5 @@ corrplot(matrix.cor, method="color",
     amount can be beneficial (my hope for the case with alcohol =))) In
     the case of fresh fruit juices and beans - could be some mixed
     impact of high amount of sugar, fiber and vitamins. Some equivocal
-    results could be also be due to the observational nature of the
-    study (survival bias).
+    results could also be due to the observational nature of the study
+    (survival bias).
