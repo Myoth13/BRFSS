@@ -28,11 +28,9 @@ editor_options:
 
 ```{r load-packages, message = FALSE}
 library(ggplot2)
-library(ggmosaic) 
 library(scales)
 library(corrplot)
 library(fitdistrplus)
-library(logspline)
 library(dplyr)
 ```
 
@@ -62,7 +60,8 @@ infectious diseases that affect the adult population.
     participates by using a cellular telephone and resides in a private
     residence or college housing.
 
-    Observational study - only **correlation** can be evaluated.
+    This is an observational study - only **correlation** can be
+    evaluated.
 
 2)  Survey design includes stratification alongside with random
     sampling. Use of the **final weight** in analysis is necessary if
@@ -225,7 +224,13 @@ resistance also include:
 In addition some medications and other health conditions can raise the
 risk.
 
-I would like to explore income level as a risk factor as well.
+There are additional topics which I want to include in this part of
+research:
+
+-   obesity as a risk factor and its relationship with other specific
+    risk factors
+
+-   evaluation of income level as a risk factor
 
 #### 2.3.2 BMI as evaluation of obesity
 
@@ -266,31 +271,29 @@ impossible to derive from this dataset.
 
 #### 2.3.3 Distribution of obesity by age groups
 
-Explore how overweight and obesity rate differ among age groups
+Explore how overweight and obesity rate differ among age groups.
 
 Variables used:
 
--   **X_rfbmi5**: Overweight Or Obese Calculated Variable
+-   **X_bmi5cat**: Computed Body Mass Index Categories
 
-```{=html}
 <!-- -->
-```
+
 -   ***X_age_g***: Imputed Age In Six Groups
 
 -   **sex**: Respondents Sex
 
 #### 2.3.4 Distribution of obesity by income groups
 
-Explore how overweight and obesity rate differ among income groups
+Explore how overweight and obesity rate differ among income groups.
 
 Variables used:
 
--   **X_rfbmi5**: Overweight Or Obese Calculated Variable
+-   **X_bmi5cat**: Computed Body Mass Index Categories
 
-```{=html}
 <!-- -->
-```
--   ***X_age_g***: Imputed Age In Six Groups
+
+-   **X_incomg**: Computed Income Categories
 
 -   **sex**: Respondents Sex
 
@@ -332,7 +335,7 @@ Variables used:
 As total diabetes score I'm going to use diabetes, pre-diabetes and
 gestational diabetes combined.
 
-#### 2.3.7 Obesity correlation with diabetes and pre-diabetes by income levels
+#### 2.3.7 Obesity correlation with diabetes by income levels
 
 In this part I will explore obesity and income as a risk factor
 
@@ -477,40 +480,57 @@ sleep hours as my metric, as there is no other data available here.
 
 #### 3.1.1 Distribution of obesity by age groups
 
--   **X_rfbmi5**: Overweight Or Obese Calculated Variable
+-   **X_bmi5cat**: Computed Body Mass Index Categories
 -   ***X_age_g***: Imputed Age In Six Groups
 -   **sex**: Respondents Sex
 
 ```{r distr_obese_age, message = FALSE}
 
+#is obese
+dat_q1 <- dat_q1 %>%
+  filter(!is.na(X_bmi5cat)) %>% 
+  mutate(X_obese = case_when (
+                    as.numeric(X_bmi5cat)==4 ~ "Obese",
+                    as.numeric(X_bmi5cat)==3 ~ "Overweight",
+                    TRUE ~ "Normal or underweight"
+  ))
+
 #calculating percentage
 for_graph_obese_age <- dat_q1 %>%
-  filter(!is.na(X_age_g), !is.na(X_rfbmi5),) %>% 
-  group_by(X_age_g,sex,X_rfbmi5) %>% 
+  filter(!is.na(X_obese)) %>% 
+  group_by(X_age_g,sex,X_obese) %>% 
   summarise(n=n()) %>% 
   group_by(X_age_g,sex) %>% 
   mutate(proc=n/sum(n)) 
 
 #distribution of obesity by age groups and sex
 for_graph_obese_age %>%
-  ggplot(aes(x = sex, y=proc,  fill = X_rfbmi5 )) +
+  ggplot(aes(x = sex, y=proc,  fill = X_obese )) +
   labs( 
        x="", 
        y="percentage",
        title = "Distribution of obesity", 
-       fill="obesity" 
+       fill="Weight" 
       ) +
   theme_light() +
   facet_wrap( ~ X_age_g) +
-  geom_bar(alpha=1,stat="identity")
+  geom_bar(alpha=1,stat="identity")+
+  scale_fill_manual(values=c("#999999", "magenta", "#56B4E9")) +
+  geom_text(
+      aes(x=sex, y=proc, label = percent(proc,2), vjust=1.5), 
+      position = position_fill()
+      ) 
+  
 ```
 
-Overweight rate is almost persistent in all age groups older 35.
-Although there is a noticable difference between sexes.
+There is a noticeable difference between sexes. We can see maximum
+amount of overweight and obese people in middle age groups. Extensive
+analyse which will account for skewness and ethnic differences
+(different BMI evaluation for Asian) is needed.
 
 #### 3.1.2 Distribution of obesity by income groups
 
--   **X_rfbmi5**: Overweight Or Obese Calculated Variable
+-   **X_bmi5cat**: Computed Body Mass Index Categories
 
 <!-- -->
 
@@ -522,29 +542,36 @@ Although there is a noticable difference between sexes.
 
 #calculating percentage
 for_graph_obese_inc <- dat_q1 %>%
-  filter(!is.na(X_incomg), !is.na(X_rfbmi5),) %>% 
-  group_by(X_incomg,sex,X_rfbmi5) %>% 
+  filter(!is.na(X_incomg), !is.na(X_obese),) %>% 
+  group_by(X_incomg,sex,X_obese) %>% 
   summarise(n=n()) %>% 
   group_by(X_incomg,sex) %>% 
   mutate(proc=n/sum(n)) 
 
 #distribution of obesity by income groups and sex
 for_graph_obese_inc %>%
-  ggplot(aes(x = sex, y=proc,  fill = X_rfbmi5 )) +
+  ggplot(aes(x = sex, y=proc,  fill = X_obese )) +
   labs( 
        x="", 
        y="percentage",
        title = "Distribution of obesity", 
-       fill="obesity" 
+       fill="Weight" 
       ) +
   theme_light() +
   facet_wrap( ~ X_incomg) +
-  geom_bar(alpha=1,stat="identity")
+  geom_bar(alpha=1,stat="identity")+
+  scale_fill_manual(values=c("#999999", "magenta", "#56B4E9")) +
+  geom_text(
+      aes(x=sex, y=proc, label = percent(proc,2), vjust=1.5), 
+      position = position_fill()
+      ) 
 ```
 
 If overall difference is not big, there is an increasing gap between men
 and women as income level increasing. It would be interesting to look at
 fresh data, as there has been a new trend in healthy lifestyle recently.
+Extensive analyse which will account for skewness and ethnic differences
+(different BMI evaluation for Asian) is needed.
 
 #### 3.1.3 Distribution of diabetes by ethnic and age groups
 
@@ -588,8 +615,15 @@ for_graph_ethno %>%
         axis.title.y  = element_text(size=8),
         axis.title.x  = element_text(size=8),
         ) +
-    facet_wrap( ~ X_age_g) +
-    geom_bar(alpha=1,stat="identity")
+  facet_wrap( ~ X_age_g) +
+  geom_bar(alpha=1,stat="identity") +
+  scale_fill_manual(values=c("#999999", "magenta")) +
+  geom_text(
+      aes(x=X_mrace1, y=proc, label = percent(proc,2), vjust=0, color = diabetes_char), 
+      position = position_fill(),
+      show.legend = FALSE
+      ) +
+  scale_colour_manual(values=c("white", "black"))
 ```
 
 #### 3.1.4 Distribution of diabetes by ethnic groups and income levels
@@ -625,15 +659,25 @@ for_graph_income %>%
         axis.title.y  = element_text(size=8),
         axis.title.x  = element_text(size=8),
         ) +
-    facet_wrap( ~ X_incomg) +
-    geom_bar(alpha=1,stat="identity")
+  facet_wrap( ~ X_incomg) +
+  geom_bar(alpha=1,stat="identity")+
+  scale_fill_manual(values=c("#999999", "magenta")) +
+  geom_text(
+      aes(x=X_mrace1, y=proc, label = percent(proc,2), vjust=0, color = diabetes_char), 
+      position = position_fill(),
+      show.legend = FALSE
+      ) +
+  scale_colour_manual(values=c("white", "black"))
 
 ```
 
 In the both diagrams same pattern can be noticed, especially it is
-prominent in the middle-old age groups and low income group.
+prominent in the middle-old age groups and low income groups.
 
-#### 3.1.5 Obesity correlation with diabetes and pre-diabetes
+Extensive analyse which will account for skewness and weights (account
+for design of the study) is needed.
+
+#### 3.1.5 Obesity correlation with diabetes
 
 -   **X_rfbmi**: Overweight Or Obese Calculated Variable
 
@@ -644,25 +688,50 @@ Obese)*
 -   ***diabete3***: (Ever Told) You Have Diabetes
 
 ```{r obesity_diabetes_corr}
-dat_q1 %>% 
-  filter(!is.na(diabetes_char),!is.na(X_rfbmi5),!is.na(X_incomg)) %>% 
-  ggplot() + 
-    geom_mosaic(aes(x = product(diabetes_char, X_rfbmi5), fill = diabetes_char )) +
-    labs(
-      y="Diabetes or pre-diabetes", 
-      x="Overweight", 
+
+#calculating percentages
+for_graph <- dat_q1 %>% 
+  select(X_incomg, X_rfbmi5, diabetes_char) %>% 
+  filter(!is.na(X_incomg), !is.na(X_rfbmi5), !is.na(diabetes_char)) %>% 
+  group_by( X_incomg, X_rfbmi5, diabetes_char) %>% 
+  summarise(n=n()) %>% 
+  group_by( X_incomg, X_rfbmi5) %>% 
+  mutate(perc=n/sum(n)) 
+
+#Obesity and CV disease distribution by income groups
+for_graph %>%
+   ggplot(aes(x = X_rfbmi5, y = perc, fill=diabetes_char, label=perc)) +
+    labs( 
       title = "Obesity and diabetes", 
+      x="Overweight or obese", 
+      y = "percent",  
       fill="Diabetes" 
-    )+
-    theme_mosaic() + 
-    facet_wrap( ~ X_incomg) 
+    ) +
+    theme_light() +
+    geom_bar(stat="identity" ) +
+    facet_wrap(~X_incomg)+
+    scale_fill_manual(values=c("#999999", "magenta")) +
+    geom_text(
+      aes(x=X_rfbmi5, y=perc, label = percent(perc,2), vjust=0, color = diabetes_char), 
+      position = position_fill(),
+      show.legend = FALSE
+    ) +
+    scale_colour_manual(values=c("white", "black"))
+
+
 ```
 
-Despite almost the same obesity rate among income groups, levels of
-diabetes differ significantly. Proportion of overweight diabetics to
-normal weight diabetics stays almost the same among all income groups.
+Despite almost the same obesity rate among income groups (see part
+3.1.2), levels of diabetes differ significantly. Also proportion of
+normal weight diabetics to overweight diabetics drops from 0,4 (12/30,
+10/24, 8/22) in groups with income level below 35,000 to 0,3 (6/18,
+4/12) in higher income groups. From which I can make a conjecture that
+income level alone could be significant risk factor for diabetes.
 
-#### 3.1.6 Obesity correlation with cardiovascular (CV) diseases
+Extensive analyse which will account for skewness and weights (account
+for design of the study) is needed.
+
+#### 3.1.6 Obesity correlation with CV diseases
 
 -   **cvdinfr4**: Ever Diagnosed With Heart Attack
 
@@ -682,11 +751,11 @@ normal weight diabetics stays almost the same among all income groups.
 dat_q1 <- dat_q1 %>% 
   filter(!is.na(cvdinfr4),!is.na(cvdcrhd4),!is.na(cvdstrk3)) %>% 
   mutate(heart_char = case_when( 
-                        as.numeric(cvdinfr4) == 1 ~ "CV", 
-                        as.numeric(cvdcrhd4) == 1 ~ "CV",
-                        as.numeric(cvdstrk3) == 1 ~ "CV",
-                        as.numeric(bphigh4) == 1 ~ "CV",
-                        TRUE ~ "No CV" 
+                        as.numeric(cvdinfr4) == 1 ~ "Yes", 
+                        as.numeric(cvdcrhd4) == 1 ~ "Yes",
+                        as.numeric(cvdstrk3) == 1 ~ "Yes",
+                        as.numeric(bphigh4) == 1 ~ "Yes",
+                        TRUE ~ "No" 
   ) %>% factor())    
 
 #calculating percentages
@@ -700,28 +769,31 @@ for_graph <- dat_q1 %>%
 
 #Obesity and CV disease distribution by income groups
 for_graph %>%
-   ggplot(aes(x = X_rfbmi5, y = perc, fill=forcats::fct_rev(heart_char), label=perc)) +
-      labs( 
-        title = "Obesity and CV disease", 
-        x="Overweight", 
-        y = "percent",  
-        fill="CV disease" 
-      ) +
-      theme_light() +
-      geom_bar(stat="identity" ) +
-      geom_text(
-        aes(x=X_rfbmi5, y=perc, label = percent(perc), vjust=1.5), 
-        position = position_fill()
-      ) + 
-      facet_wrap(~X_incomg)
-
+  ggplot(aes(x = X_rfbmi5, y = perc, fill=heart_char, label=perc)) +
+    labs( 
+      title = "Obesity and CV disease", 
+      x="Overweight", 
+      y = "percent",  
+      fill="CV disease" 
+    ) +
+    theme_light() +
+    geom_bar(stat="identity" ) +
+    facet_wrap(~X_incomg) +
+    scale_fill_manual(values=c("#999999", "magenta")) +
+    geom_text(
+      aes(x=X_rfbmi5, y=perc, label = percent(perc,2), vjust=0, color = heart_char),       position = position_fill(),
+      show.legend = FALSE
+    ) +
+    scale_colour_manual(values=c("white", "black"))
 
 ```
 
-Here I added numerical representation of percentages because here we can
-see slightly different pattern. Income has a less weight in the obese
-(increased in 1,5 times between marginal income levels) than normal
-group (percent of CV doubled).
+We can see here slightly different pattern. Income has a less weight in
+the obese (increased in 1,5 times between marginal income levels) than
+normal group (percent of CV doubled). But overall dynamics is the same.
+
+Extensive analyse which will account for skewness and weights (account
+for design of the study) is needed.
 
 #### 3.1.7 Conclusion
 
