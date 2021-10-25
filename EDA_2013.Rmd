@@ -32,6 +32,7 @@ library(scales)
 library(corrplot)
 library(fitdistrplus)
 library(dplyr)
+library(RColorBrewer)
 ```
 
 ### 1.2 Load data
@@ -86,7 +87,8 @@ brfss2013 %>%
       theme_light() +
       theme(axis.text.x = element_text(size=11, angle = 90, vjust = 0.5, hjust=1)) +
       geom_bar() +
-      facet_wrap(~sex)
+      facet_wrap(~sex) +
+      scale_fill_brewer(palette = "Set2")
 ```
 
 Indeed, age demographics is heavily skewed to the older age, especially
@@ -512,13 +514,13 @@ for_graph_obese_age %>%
   labs( 
        x="", 
        y="percentage",
-       title = "Distribution of obesity", 
+       title = "Distribution of obesity by age and sex", 
        fill="Weight" 
       ) +
   theme_light() +
   facet_wrap( ~ X_age_g) +
   geom_bar(alpha=1,stat="identity")+
-  scale_fill_manual(values=c("#999999", "magenta", "#56B4E9")) +
+  scale_fill_manual(values=c("#e6f5d0", "#c51b7d", "#4d9221")) +
   geom_text(
       aes(x=sex, y=perc, label = percent(perc,2), vjust=1.5), 
       position = position_fill()
@@ -557,17 +559,18 @@ for_graph_obese_inc %>%
   labs( 
        x="", 
        y="percentage",
-       title = "Distribution of obesity", 
+       title = "Distribution of obesity by income and sex", 
        fill="Weight" 
       ) +
   theme_light() +
   facet_wrap( ~ X_incomg) +
   geom_bar(alpha=1,stat="identity")+
-  scale_fill_manual(values=c("#999999", "magenta", "#56B4E9")) +
+  scale_fill_manual(values=c("#e6f5d0", "#c51b7d", "#4d9221")) +
   geom_text(
       aes(x=sex, y=perc, label = percent(perc,2), vjust=1.5), 
       position = position_fill()
       ) 
+  
 ```
 
 If the overall difference is not big, there is an increasing gap between
@@ -620,7 +623,7 @@ for_graph_ethno %>%
         ) +
   facet_wrap( ~ X_age_g) +
   geom_bar(alpha=1,stat="identity") +
-  scale_fill_manual(values=c("#999999", "magenta")) +
+  scale_fill_manual(values=c("#e6f5d0", "#c51b7d")) +
   geom_text(
       aes(x=X_mrace1, y=perc, label = percent(perc,2), vjust=0, color = diabetes_char), 
       position = position_fill(),
@@ -664,7 +667,7 @@ for_graph_income %>%
         ) +
   facet_wrap( ~ X_incomg) +
   geom_bar(alpha=1,stat="identity")+
-  scale_fill_manual(values=c("#999999", "magenta")) +
+  scale_fill_manual(values=c("#e6f5d0", "#c51b7d")) +
   geom_text(
       aes(x=X_mrace1, y=perc, label = percent(perc,2), vjust=0, color = diabetes_char), 
       position = position_fill(),
@@ -715,7 +718,7 @@ for_graph %>%
     theme_light() +
     geom_bar(stat="identity" ) +
     facet_wrap(~X_incomg)+
-    scale_fill_manual(values=c("#999999", "magenta")) +
+    scale_fill_manual(values=c("#e6f5d0", "#c51b7d")) +
     geom_text(
       aes(x=X_rfbmi5, y=perc, label = percent(perc,2), vjust=0, color = diabetes_char), 
       position = position_fill(),
@@ -782,7 +785,7 @@ for_graph %>%
     theme_light() +
     geom_bar(stat="identity" ) +
     facet_wrap(~X_incomg) +
-    scale_fill_manual(values=c("#999999", "magenta")) +
+    scale_fill_manual(values=c("#e6f5d0", "#c51b7d")) +
     geom_text(
       aes(x=X_rfbmi5, y=perc, label = percent(perc,2), vjust=0, color = heart_char),       position = position_fill(),
       show.legend = FALSE
@@ -896,13 +899,13 @@ dat_q3 %>%
    ggplot() +
     labs( title = "Distribution of health", x="general health" ) +
     theme_light() + 
-    stat_density(aes(x=genhlth_num, y=..scaled.., color="magenta"), geom="line") +
-     stat_density(aes(x=X_health_benchmark, y=..scaled.., color="cyan"), geom="line") +
+    geom_density(aes(x=genhlth_num, y=..scaled.., color="General health"), geom="line") +
+    geom_density(aes(x=X_health_benchmark, y=..scaled.., color="Combined health benchmark"), geom="line") +
     scale_x_continuous(name='Health score') +
-    scale_color_discrete(
-      name='Health benchmark type',
-      labels=c("Combined health benchmark", "Based on general health")
-    )
+    scale_color_manual(
+        name='Health benchmark type',
+        values = c("General health"="#c51b7d","Combined health benchmark"="#4d9221")
+     ) 
 ```
 
 We can see that the combined general health score is distributed more
@@ -954,7 +957,7 @@ dat_q3 %>%
   ggplot() +
     labs( title = "Distribution of fruit daily intake", x="fruit daily intake" ) +
     theme_light() + 
-    stat_density(aes(x=X_fruit_daily+0.01, y=..scaled..), geom="line",color="magenta") 
+    stat_density(aes(x=X_fruit_daily+0.01, y=..scaled..), geom="line",color="#c51b7d") 
 
 ```
 
@@ -1005,7 +1008,8 @@ dat_q3 %>%
       color="Age groups" 
     ) +
     theme_light() + 
-    stat_density(aes(x=X_fruit_daily, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_fruit_daily, y=..scaled.., color=X_age_g), geom="line") + 
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark correlation
@@ -1018,7 +1022,8 @@ dat_q3 %>%
    labs( x="fruit daily intake", title = "health score and fruit daily intake", color="age" ) +
     theme_light() +
     geom_smooth() +
-    facet_wrap( ~ sex)
+    facet_wrap( ~ sex)+ 
+    scale_color_brewer(palette = "Set1")
 
 ```
 
@@ -1076,7 +1081,8 @@ dat_q3 %>%
     stat_density(aes(x=X_vege_green_daily+0.01, y=..scaled.., color=X_age_g), geom="line") +
     scale_x_continuous(trans = log10_trans(),
     breaks = trans_breaks("log10", function(x) 10^x),
-    labels = trans_format("log10", math_format(10^.x))) 
+    labels = trans_format("log10", math_format(10^.x))) + 
+    scale_color_brewer(palette = "Set1")
 ```
 
 ###### Distribution analysis
@@ -1116,7 +1122,8 @@ dat_q3 %>%
       color="Age groups" 
     ) +
     theme_light() + 
-     stat_density(aes(x=X_vege_green_daily, y=..scaled.., color=X_age_g), geom="line") 
+     stat_density(aes(x=X_vege_green_daily, y=..scaled.., color=X_age_g), geom="line") + 
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark correlation
@@ -1133,7 +1140,8 @@ dat_q3 %>%
     ) +
     theme_light() +
     geom_smooth() +
-    facet_wrap( ~ sex )
+    facet_wrap( ~ sex )+ 
+    scale_color_brewer(palette = "Set1")
 ```
 
 Nonlinear. Positive on a continuous interval [0,1] . Extended analysis
@@ -1189,7 +1197,8 @@ dat_q3 %>%
       color="Age groups"
     ) +
     theme_light() +
-    stat_density(aes(x=X_vege_orange_daily+0.01, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_vege_orange_daily+0.01, y=..scaled.., color=X_age_g), geom="line") + 
+    scale_color_brewer(palette = "Set1")
 ```
 
 ###### Distribution analysis
@@ -1230,7 +1239,8 @@ dat_q3 %>%
       color="Age groups" 
     ) +
     theme_light() +
-    stat_density(aes(x=X_vege_orange_daily, y=..scaled.., color=X_age_g), geom="line")
+    stat_density(aes(x=X_vege_orange_daily, y=..scaled.., color=X_age_g), geom="line") +
+   scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark correlation
@@ -1247,7 +1257,8 @@ dat_q3 %>%
     ) +
     theme_light() +
     geom_smooth() +
-    facet_wrap( ~ sex )
+    facet_wrap( ~ sex )+ 
+    scale_color_brewer(palette = "Set1")
 
 ```
 
@@ -1303,7 +1314,8 @@ dat_q3 %>%
     stat_density(aes(x=X_beans_weekly+0.01, y=..scaled.., color=X_age_g), geom="line") +
     scale_x_continuous(trans = log10_trans(),
     breaks = trans_breaks("log10", function(x) 10^x),
-    labels = trans_format("log10", math_format(10^.x))) 
+    labels = trans_format("log10", math_format(10^.x))) + 
+    scale_color_brewer(palette = "Set1")
 ```
 
 ###### Distribution analysis
@@ -1336,10 +1348,6 @@ needed later.
 
 ```{r X_beans_weekly_final}
 
-#I think I can reasonably ditch data with X_beans_weekly > 25
-dat_q3 <- dat_q3 %>%
-  filter(X_beans_weekly <= 25)
-
 dat_q3 %>%
   ggplot() +
     labs( 
@@ -1348,7 +1356,8 @@ dat_q3 %>%
       color="Age groups" 
     ) +
     theme_light() + 
-    stat_density(aes(x=X_beans_weekly, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_beans_weekly, y=..scaled.., color=X_age_g), geom="line") + 
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark correlation
@@ -1361,7 +1370,8 @@ dat_q3 %>%
    labs( x="beans weekly intake", title = "health score and beans intake", color="age" ) +
     theme_light() +
     geom_smooth() +
-    facet_wrap( ~ X_age_g)
+    facet_wrap( ~ X_age_g)+ 
+    scale_color_brewer(palette = "Set1")
 
 ```
 
@@ -1393,13 +1403,14 @@ for_graph <- dat_q3 %>%
 #distribution inside age groups
 for_graph %>%
    ggplot(aes(x = X_age_g, y = perc, fill=exerany2)) +
-      labs( 
-        title = "Exercising distribution in age groups", 
-        x="", 
-        y = "percent",  
-        fill="Exercise" ) +
-      theme_light() +
-      geom_bar(stat="identity" ) 
+    labs( 
+      title = "Exercising distribution in age groups", 
+      x="", 
+      y = "percent",  
+      fill="Exercise" ) +
+    theme_light() +
+    geom_bar(stat="identity" ) +
+    scale_fill_manual(values=c("#e6f5d0", "#c51b7d")) 
 ```
 
 ##### Health benchmark correlation
@@ -1408,10 +1419,11 @@ for_graph %>%
 
 dat_q3 %>%
   ggplot(aes(x=exerany2, y=X_health_benchmark, color=X_age_g )) +
-   labs( x="exercising", title = "health score and exercising", color="age" ) +
+    labs( x="exercising", title = "health score and exercising", color="age" ) +
     theme_light() +
     geom_boxplot(alpha=0) +
-    facet_wrap( ~ sex )
+    facet_wrap( ~ sex )+
+    scale_color_brewer(palette = "Set1")
 
 ```
 
@@ -1460,7 +1472,8 @@ dat_q3 %>%
     scale_x_continuous(trans = log10_trans(),
     breaks = trans_breaks("log10", function(x) 10^x),
     labels = trans_format("log10", math_format(10^.x))) +
-    facet_wrap(~sex)
+    facet_wrap(~sex) +
+    scale_color_brewer(palette = "Set1")
 ```
 
 Normalizing to CDC definition as heavy drinking
@@ -1520,7 +1533,8 @@ dat_q3 %>%
     ) +
     theme_light() + 
     stat_density(aes(x=X_alcohol_num, y=..scaled.., color=X_age_g), geom="line") +
-    facet_wrap(~sex)
+    facet_wrap(~sex) +
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark
@@ -1533,7 +1547,8 @@ dat_q3 %>%
    labs( x="normalized alcohol consumption", title = "health score and alcohol", color="age" ) +
     theme_light() +
     geom_smooth() +
-    facet_wrap( ~ X_age_g )
+    facet_wrap( ~ X_age_g )+
+    scale_color_brewer(palette = "Set1")
 
 ```
 
@@ -1574,7 +1589,8 @@ for_graph %>%
         fill="smoking" 
       ) +
       theme_light() +
-      geom_bar(stat="identity" ) 
+      geom_bar(stat="identity" ) +
+    scale_fill_manual(values=c("#e6f5d0", "#c51b7d")) 
 ```
 
 ##### Health benchmark correlation
@@ -1587,7 +1603,8 @@ dat_q3 %>%
    labs( x="smoking", title = "health score and smoking", color="age" ) +
     theme_light() +
     geom_boxplot(alpha=0) +
-    facet_wrap( ~ sex )
+    facet_wrap( ~ sex )+
+    scale_color_brewer(palette = "Set1")
 
 ```
 
@@ -1633,8 +1650,8 @@ dat_q3 %>%
     stat_density(aes(x=sleptim1+0.01, y=..scaled.., color=X_age_g), geom="line") +
     scale_x_continuous(trans = "log10",
     breaks = trans_breaks("log10", function(x) 10^x),
-    labels = trans_format("log10", math_format(10^.x)))  
-
+    labels = trans_format("log10", math_format(10^.x)))  +
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Final distribution
@@ -1653,7 +1670,8 @@ dat_q3 %>%
   ggplot() +
     labs( title = "Distribution of sleeping hours daily", x="sleeping hours", color="Age groups" ) +
     theme_light() + 
-    stat_density(aes(x=X_sleptim_norm, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_sleptim_norm, y=..scaled.., color=X_age_g), geom="line") +
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark correlation
@@ -1666,8 +1684,8 @@ dat_q3 %>%
    labs( x="sleeping time normalized", title = "health score and sleep", color="age" ) +
    theme_light() +
    geom_smooth() +
-   facet_wrap( ~ sex)
-
+   facet_wrap( ~ sex)+
+    scale_color_brewer(palette = "Set1")
 ```
 
 The relationship is not linear with an optimal value between 1 and 1,5.
@@ -1723,7 +1741,8 @@ dat_q3 %>%
     stat_density(aes(x=X_sugars_juice+0.01, y=..scaled.., color=X_age_g), geom="line") +
     scale_x_continuous(trans = log10_trans(),
     breaks = trans_breaks("log10", function(x) 10^x),
-    labels = trans_format("log10", math_format(10^.x)))   
+    labels = trans_format("log10", math_format(10^.x)))   +
+    scale_color_brewer(palette = "Set1")
 ```
 
 Right skewed with outliers
@@ -1744,7 +1763,8 @@ dat_q3 %>%
       color="age group" 
     ) +
     theme_light() + 
-    stat_density(aes(x=X_sugars_juice, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_sugars_juice, y=..scaled.., color=X_age_g), geom="line")+
+    scale_color_brewer(palette = "Set1") 
 ```
 
 ##### Health benchmark correlation
@@ -1757,8 +1777,8 @@ dat_q3 %>%
    labs( x="juice consumption", title = "health score and fresh juice", color="age" ) +
     theme_light() +
     geom_smooth() +
-    facet_wrap( ~ X_age_g + sex )
-
+    facet_wrap( ~ X_age_g + sex )+
+    scale_color_brewer(palette = "Set1")
 ```
 
 Nonlinear for some groups, very mixed results, will not include in total
@@ -1814,7 +1834,8 @@ dat_q3_sugar %>%
       color="age group"
     ) +
     theme_light() + 
-    stat_density(aes(x=X_sugars_soda+0.01, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_sugars_soda, y=..scaled.., color=X_age_g), geom="line") +
+    scale_color_brewer(palette = "Set1")
 ```
 
 Right skewed with outliers
@@ -1835,7 +1856,8 @@ dat_q3_sugar %>%
       color="age group" 
     ) +
     theme_light() + 
-    stat_density(aes(x=X_sugars_soda, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_sugars_soda, y=..scaled.., color=X_age_g), geom="line") +
+    scale_color_brewer(palette = "Set1")
 ```
 
 Righ
@@ -1850,8 +1872,8 @@ dat_q3_sugar %>%
    labs( x="soda consumption", title = "health score and soda", color="age" ) +
     theme_light() +
     geom_smooth(method = "lm") +
-    facet_wrap( ~ X_age_g )
-
+    facet_wrap( ~ X_age_g )+
+    scale_color_brewer(palette = "Set1")
 ```
 
 There is an observable negative correlation
@@ -1906,9 +1928,8 @@ dat_q3_sugar %>%
      stat_density(aes(x=X_sugars_other +0.01, y=..scaled.., color=X_age_g), geom="line") +
     scale_x_continuous(trans = log10_trans(),
     breaks = trans_breaks("log10", function(x) 10^x),
-    labels = trans_format("log10", math_format(10^.x)))   
-
-
+    labels = trans_format("log10", math_format(10^.x)))   +
+    scale_color_brewer(palette = "Set1")
 ```
 
 Right skewed with outliers
@@ -1930,7 +1951,8 @@ dat_q3_sugar %>%
       color="age group" 
     ) +
     theme_light() +
-     stat_density(aes(x=X_sugars_other, y=..scaled.., color=X_age_g), geom="line") 
+    stat_density(aes(x=X_sugars_other, y=..scaled.., color=X_age_g), geom="line")+
+    scale_color_brewer(palette = "Set1")
 ```
 
 ##### Health benchmark correlation
@@ -1947,8 +1969,8 @@ dat_q3_sugar %>%
     ) +
     theme_light() +
     geom_smooth(method = "lm") +
-    facet_wrap( ~ X_age_g, scales="free_x" )
-
+    facet_wrap( ~ X_age_g, scales="free_x" )+
+    scale_color_brewer(palette = "Set1")
 ```
 
 There is an observable negative correlation
@@ -1971,13 +1993,14 @@ dat_q3_sugar <- dat_q3_sugar %>%
 #checking distribution 
 dat_q3_sugar %>%
   ggplot() +
-    labs( 
-      title = "Distribution of sugary drinks consumption", 
-      x="sugary drinks consumption", 
-      color="age group" 
-    ) +
-    theme_light() + 
-   stat_density(aes(x=X_sugars_total, y=..scaled.., color=X_age_g), geom="line") 
+  labs( 
+    title = "Distribution of sugary drinks consumption", 
+    x="sugary drinks consumption", 
+    color="age group" 
+  ) +
+  theme_light() + 
+  stat_density(aes(x=X_sugars_total, y=..scaled.., color=X_age_g), geom="line") +
+  scale_color_brewer(palette = "Set1")
 ```
 
 Example of the output of the model for **male** (sex=1) **age 45 to 54**
